@@ -1,0 +1,8 @@
+altair
+pandas
+streamlit
+streamlit-option-menu
+google-generativeai
+google-cloud-aiplatform
+google-cloud-logging
+python-docx

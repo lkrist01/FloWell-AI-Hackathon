@@ -1,0 +1,5 @@
+Patient Name,Gender,Patient DOB,NHS Number,Hospital Number,Ward/ Bed number,Specialty
+Jack Williams,M,16/04/2008,1234567890,CN12345,"Rose Ward, Bay 2 Bed 5",Geriatrics
+Sarah Johnson,F,15/03/1988,2233445671,CN23456,"Lily Ward, Bay 5, Bed 2",Gastroenterology
+Dakota Fanning,F,25/10/1992,2435374682,CN34567,"Hyacinth Ward, Bay 3, Bed 4",Cardiology
+Sam Smith,M,11/03/2003,22343274235,CN45678,"Daffodil Ward, Bay 1, Bed 4",Renal
