@@ -120,14 +120,13 @@ st.set_page_config(
     page_icon="🏥",
     layout="wide",
     initial_sidebar_state="expanded",
-    menu_items={
-        'About': "# This is a header. This is an *extremely* cool app!"
-    }
 )
 
 with st.sidebar:
     logo_url = "data/logo.jpg"
-    st.sidebar.image(logo_url)
+    st.markdown("<h1 style='text-align: center; font-size: 50px; font-family: Serif;, color: #141A46;'>FloWell</h1>", unsafe_allow_html=True)
+    # st.sidebar.title(":blue[FloWell]")
+    st.sidebar.image(logo_url, use_column_width=True)
     selected = option_menu("Main Menu", ["Home", 'Admissions', "Clinical Notes"], 
         icons=['house', 'hospital', "clipboard"], menu_icon="cast", default_index=2)
 
