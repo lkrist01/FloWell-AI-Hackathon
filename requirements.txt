@@ -2,6 +2,9 @@ altair
 pandas
 streamlit
 streamlit-option-menu
+streamlit-vis-timeline # streamlit_timeline
+setuptools
+python-dotenv
 google-generativeai
 google-cloud-aiplatform
 google-cloud-logging
