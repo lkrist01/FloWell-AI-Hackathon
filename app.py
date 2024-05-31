@@ -6,9 +6,8 @@ from streamlit_option_menu import option_menu
 from streamlit_timeline import st_timeline
 import datetime
 import time
-from fpdf import FPDF
 import json
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import google.generativeai as genai 
 import vertexai
 from vertexai.generative_models import (
@@ -26,12 +25,12 @@ from io import BytesIO, StringIO
 # http://34.42.44.59:8081/
 
 # Load environment variables from .env file
-load_dotenv()
+# load_dotenv()
 
 api_key = os.getenv("GOOGLE_API_KEY")
 
 # Configure the Google Generative AI with the API key
-genai.configure(api_key=api_key)
+# genai.configure(api_key=api_key)
 
 def get_all_notes_text(df, nhs_id):
     #note = ''
@@ -71,18 +70,6 @@ def download_text(text, filename="text_file.txt"):
     except Exception as e:
         st.error(f"Error downloading file: {e}")
 
-
-def create_text_file(text):
-    # Create an in-memory text stream
-    text_io = BytesIO()
-    
-    # Write the text to the stream
-    text_io.write(text)
-    
-    # Move the cursor to the beginning of the stream
-    text_io.seek(0)
-    
-    return text_io
 
 @st.cache_resource
 def load_model():
@@ -127,17 +114,6 @@ def get_gemini_pro_text_response(
     return " ".join(final_response)
 
 
-
-def generate_pdf(text):
-    """Generate an example pdf file and save it to example.pdf"""
-    
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt=text, ln=1, align="C") 
-    pdf.output("example.pdf")
-
-
 st.set_page_config(
     page_title="FloWell App",
     page_icon="🏥",
@@ -149,25 +125,40 @@ st.set_page_config(
 )
 
 with st.sidebar:
+    logo_url = "data/logo.jpg"
+    st.sidebar.image(logo_url)
     selected = option_menu("Main Menu", ["Home", 'Admissions', "Clinical Notes"], 
         icons=['house', 'hospital', "clipboard"], menu_icon="cast", default_index=2)
 
+  
 
 if selected == "Home":
     """
     # Flowell
 
     Welcome to Flowell! An application designed to enhance integrated care and discharge processes by summarising information from patient electronic health records into an accurate timeline of events, creating a more productive pipeline that flows well!
+    
+    FloWell provides exactly that. Using StreamLit, Vertex AI and Gemini API, we created a dynamic navigator of the patient’s journey, turning complex notes into a clear, concise timeline, so you can understand their journey in seconds.
     """
 
 elif selected == "Admissions": 
-    pass
-else:
+
+    st.subheader("NHS Hospitals Admissions:")
     
+    df_hospitals = pd.read_csv("data/Hospital.csv")
+    df_hospitals.dropna(inplace=True)
+    st.map(df_hospitals,
+        latitude='Latitude',
+        longitude='Longitude',
+    )
+
+    df_admissions = pd.read_csv("data/admissions.csv")
+    st.dataframe(df_admissions) 
+else:
     
     df_patients = pd.read_csv("data/patients.csv")
     ids = df_patients["NHS Number"].unique()
-    text_model_pro = load_model()
+    # text_model_pro = load_model()
     
     #Patient selector
     id_option = st.selectbox("Select the patient nhsID:",(ids))
@@ -175,7 +166,7 @@ else:
 
     # patient info
     with st.expander("See patient details:"):
-        st.dataframe(df_patients[df_patients["NHS Number"] == id_option].T) 
+        st.dataframe(df_patients[df_patients["NHS Number"] == id_option].T, use_container_width=True) 
             
     # Read notes dataframe
     df_notes = pd.read_csv("data/updated_patient_notes.csv")
@@ -205,7 +196,7 @@ else:
     }
 
     df_problems = pd.DataFrame(problems)
-    edited_df = st.data_editor(df_problems)
+    edited_df = st.data_editor(df_problems, use_container_width=True)
     
     st.header("Vertex AI Gemini API", divider="rainbow")
     tab1, tab2, tab3 = st.tabs(
@@ -230,12 +221,13 @@ else:
         horizontal=True,
         )
         
-        prompt = f""" Generate a current, up to date summary of the patient's journey. The length of the summary should be {length_of_summary}. The response should be returned as {type_of_text}.
+        prompt = f""" 
+            Generate a current, up to date summary of the patient's journey. The length of the summary should be {length_of_summary}. The response should be returned as {type_of_text}.
 
-Patient Input Notes: {patient_note} \n
+            Patient Input Notes: {patient_note} \n
 
-Output Example:\n
-Mrs. Johnson, a 62-year-old female with a history of poorly controlled type 2 diabetes, hypertension, and hyperlipidemia, was admitted to the hospital for hyperglycemia, dehydration, and possible skin infection. She presented with excessive thirst, frequent urination, blurred vision, fatigue, and increased appetite. Upon admission, she received intravenous fluids and regular insulin drip, and her blood glucose levels gradually decreased. Her skin lesions were treated with topical antibiotics and showed signs of improvement. After a successful course of treatment, she was discharged home with instructions for self-monitoring blood glucose levels, medication regimen, and follow-up appointments.
+            Output Example:\n
+            Mrs. Johnson, a 62-year-old female with a history of poorly controlled type 2 diabetes, hypertension, and hyperlipidemia, was admitted to the hospital for hyperglycemia, dehydration, and possible skin infection. She presented with excessive thirst, frequent urination, blurred vision, fatigue, and increased appetite. Upon admission, she received intravenous fluids and regular insulin drip, and her blood glucose levels gradually decreased. Her skin lesions were treated with topical antibiotics and showed signs of improvement. After a successful course of treatment, she was discharged home with instructions for self-monitoring blood glucose levels, medication regimen, and follow-up appointments.
 
         """
 
@@ -252,11 +244,12 @@ Mrs. Johnson, a 62-year-old female with a history of poorly controlled type 2 di
                 first_tab1, first_tab2 = st.tabs(["Generate summary", "Prompt"])
                 with first_tab1:
                     
-                    response = get_gemini_pro_text_response(
-                        text_model_pro,
-                        prompt,
-                        generation_config=config,
-                    )
+                    response =["hello this is the summary"] 
+                    # response = get_gemini_pro_text_response(
+                    #     text_model_pro,
+                    #     prompt,
+                    #     generation_config=config,
+                    # )
                     if response:
                         st.write("Your summary:")
                         with st.chat_message("user"):
@@ -286,61 +279,73 @@ Mrs. Johnson, a 62-year-old female with a history of poorly controlled type 2 di
                              specialities,
                              ["Nurse", "Doctor"])
         
-        # Timeline
-#         prompt = f"""
-#         Give me a list of key events in max 3 words from the patients notes below. These will be put onto the timeline in our app. Make sure to have a start and end which represents the day of the event are in datetime. The start and end should be the same day. Give me the results in json format. So that I can easily convert it to dictionary in python. The field name for the key events should be called content. Convert json index to id field. This is an example: "id": 1, "content": "Admission", "start": "2022-10-09:19:00:00", "end":"2022-10-09:20:00:00 \n
-
-#         Patient notes input: {patient_note}\n
-#         """
-
+        #------------------------------------ Timeline prompt section----------------------------------------------------------------------------
         prompt = f"""
-        Give me a list of key events in max 3 words from the patients notes below. These will be put onto the timeline in our app. Make sure to have a start and end which represents the day of the event are in datetime. The start and end should be the same day. Give me the results in json format. So that I can easily convert it to dictionary in python. The field name for the key events should be called content. Convert json index to id field. This is an example how the type of response might look: "id": 1, "content": "Admission", "start": "2022-10-09T:19:00:00", "end":"2022-10-09T:20:00:00 \n
+            Give me a list of key events in max 3 words from the patients notes below. These will be put onto the timeline in our app. Make sure to have a start and end which represents the day of the event are in datetime. The start and end should be the same day. Give me the results in json format. So that I can easily convert it to dictionary in python. The field name for the key events should be called content. Convert json index to id field. This is an example how the type of response might look: "id": 1, "content": "Admission", "start": "2022-10-09T:19:00:00", "end":"2022-10-09T:20:00:00 \n
 
-Instructions for the content:\n 
-Dont put patient names, just procedures\n
-Dont put confidential data\n
-Give me the 6 most important events\n
-End Date be between 1 day to 2 days length\n
+            Instructions for the content:\n 
+            Dont put patient names, just procedures\n
+            Dont put confidential data\n
+            Give me the 6 most important events\n
+            End Date be between 1 day to 2 days length\n
 
-Patient notes input that you need to extract the data from: {patient_note}
+            Patient notes input that you need to extract the data from: {patient_note}
         """
 
         config = {
             "temperature": 0.9,
             "max_output_tokens": 2048,
         }
-
-        generate_timeline = st.button("Generate the timeline", key="generate_timeline")
         
-        if generate_timeline and prompt:
+        #Create the session with button clicked
+        if 'clicked' not in st.session_state:
+            st.session_state.clicked = False
+
+        def click_button():
+            st.session_state.clicked = True
+
+        generate_timeline = st.button("Generate the timeline", on_click=click_button)
+
+        if st.session_state.clicked and prompt:
+            # The message and nested widget will remain on the page
             # st.write(prompt)
             with st.spinner("Generating your story using Gemini ..."):
                 first_tab1, first_tab2 = st.tabs(["Timeline", "Prompt"])
-                with first_tab1:
-                    response = get_gemini_pro_text_response(
-                        text_model_pro,
-                        prompt,
-                        generation_config=config,
-                    )
+                
+                with first_tab1:    
+                    response = [
+                        {"id": 1, "content": "static 1", "start": "2022-10-20"},
+                        {"id": 2, "content": "Editable 1", "start": "2022-10-09", "editable": True},
+                        {"id": 3, "content": "Editable 2", "start": "2022-10-18", "editable": True},
+                        {"id": 4, "content": "static 2", "start": "2022-10-16"},
+                        {"id": 5, "content": "static 3", "start": "2022-10-25"},
+                        {"id": 6, "content": "static 4", "start": "2022-10-27"},
+                    ]
+                    # response = get_gemini_pro_text_response(
+                    #     text_model_pro,
+                    #     prompt,
+                    #     generation_config=config,
+                    # )
                     if response:
                         
                         st.write("Timeline:")
                         # st.write(response)
                         # import pdb; pdb.set_trace()
-                        temp = ''.join(response).replace('```', '').replace('\n', '').replace(' ', '').replace("'",'"').replace("json","")
-                        items = json.loads(temp)
-                        
-                        with st.expander("see raw response"):
+                        # temp = ''.join(response).replace('```', '').replace('\n', '').replace(' ', '').replace("'",'"').replace("json","")
+                        # items = json.loads(temp)
+                        items = response
+
+                        with st.expander("See raw response"):
                             st.write(items)
                         
                         st.subheader("Patient event timeline:")
                         events = st_timeline(items, groups=[], options={}, height="300px")
+                        
                         st.subheader("Selected note:")
-                        st.write(events)
-
                         with st.chat_message("user"):
                             container = st.container(border=True)
-                            st.write(f"You wrote {len(response)} characters.")
+                            st.write(events)
+
                 with first_tab2:
                     st.text(prompt)
 
@@ -385,7 +390,7 @@ Patient notes input that you need to extract the data from: {patient_note}
         }
 
         df_discharge = pd.DataFrame(discharge_tasks)
-        discharge_edited = st.data_editor(df_discharge)
+        discharge_edited = st.data_editor(df_discharge, use_container_width=True)
 
         if discharge_edited['Completed'].all() == True:
 
@@ -395,16 +400,12 @@ Patient notes input that you need to extract the data from: {patient_note}
             st.header("Print patient procedure")
             if st.button("Generate Text"):
              
-                txt ="""
+                txt ="""\n
                     You were admitted to the hospital with severe chest pain radiating to your left arm. This indicated a possible heart attack (myocardial infarction).
-
-Upon arrival, an EKG was performed, which showed signs of a heart attack. Blood tests confirmed this diagnosis. A cardiologist recommended an urgent procedure called a coronary angioplasty with stent placement to open up a blocked artery.
-
-The procedure was successful in opening the blocked artery in your left anterior descending artery (LAD) and placing a stent. You recovered well from the procedure, and your pain was managed with medication.
-
-During your stay, you received physical therapy, occupational therapy, and education from a dietician to help you recover and regain your strength. You also had an echocardiogram, which showed good left ventricular function with minimal wall motion abnormality.
-
-You were discharged home on May 27th with medication and a follow-up appointment scheduled. You were also given instructions for a home exercise program and advice on lifestyle changes to maintain good heart health. Please be sure to contact your doctor if you experience any chest pain, shortness of breath, dizziness, or swelling in your legs.
+                    Upon arrival, an EKG was performed, which showed signs of a heart attack. Blood tests confirmed this diagnosis. A cardiologist recommended an urgent procedure called a coronary angioplasty with stent placement to open up a blocked artery.
+                    The procedure was successful in opening the blocked artery in your left anterior descending artery (LAD) and placing a stent. You recovered well from the procedure, and your pain was managed with medication.
+                    During your stay, you received physical therapy, occupational therapy, and education from a dietician to help you recover and regain your strength. You also had an echocardiogram, which showed good left ventricular function with minimal wall motion abnormality.
+                    You were discharged home on May 27th with medication and a follow-up appointment scheduled. You were also given instructions for a home exercise program and advice on lifestyle changes to maintain good heart health. Please be sure to contact your doctor if you experience any chest pain, shortness of breath, dizziness, or swelling in your legs.
                     """
 
                 st.write(txt)
@@ -412,14 +413,14 @@ You were discharged home on May 27th with medication and a follow-up appointment
                 st.success("The text file has been created successfully!")
             
         else:
-            st.write("Complete the remaining task to proceed discharge!")
-
+            st.warning('Complete the remaining task to proceed discharge!', icon="⚠️")
 
 with st.sidebar:
     with st.expander("Chat Bot:", expanded=True):
         messages = st.container(height=300)
         messages.chat_message("user").write("Hello!")
         messages.chat_message("assistant").write(f"Echo: Hello, how can i help you?")
+
         if prompt := st.chat_input("Say something"):
             messages.chat_message("user").write(prompt)
             messages.chat_message("assistant").write(f"Echo: {prompt}")
