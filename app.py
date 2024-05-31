@@ -35,7 +35,7 @@ api_key = os.getenv("GOOGLE_API_KEY")
 
 def get_all_notes_text(df, nhs_id):
     #note = ''
-    r = df[df["NHS Number"] == 2233445671]
+    r = df[df["NHS Number"] == nhs_id]
     r1 = ", ".join(r["Notes Entry"].astype(str))
     return r1
 
