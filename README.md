@@ -18,3 +18,4 @@ Cost-effective minimising repeated visits/ procedures/ imaging
 Technical Components and Requirements:
 EHR configuration, patient note examples
 
+![alt text](https://github.com/lkrist01/FloWell-AI-Hackathon/blob/main/demo_app.png?raw=true)
