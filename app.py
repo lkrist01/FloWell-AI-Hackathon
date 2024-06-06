@@ -1,10 +1,11 @@
 import random
+import datetime
 import altair as alt
 import numpy as np
 import pandas as pd
 import streamlit as st
 from streamlit_option_menu import option_menu
-from streamlit_timeline import st_timeline
+from streamlit_timeline import timeline
 import datetime
 import time
 import json
@@ -52,25 +53,6 @@ def create_word_doc(text):
 # Function to update the value in session state
 def clicked(button):
     st.session_state.clicked[button] = True
-
-
-def download_text(text, filename="text_file.txt"):
-    """Downloads the given text as a text file."""
-    try:
-        os.makedirs("discharges", exist_ok=True)
-        filepath = os.path.join("discharges", filename)
-        with open(filepath, "w", encoding="utf-8") as file:
-            file.write(text)
-        st.success(f"File '{filename}' downloaded successfully!")
-        st.download_button(
-            label="Download Text File",
-            data=open(filepath, "rb").read(),
-            file_name=filename,
-            mime="text/plain"
-        )
-    except Exception as e:
-        st.error(f"Error downloading file: {e}")
-
 
 @st.cache_resource
 def load_model():
@@ -125,7 +107,6 @@ st.set_page_config(
 with st.sidebar:
     logo_url = "data/logo.jpg"
     st.markdown("<h1 style='text-align: center; font-size: 50px; font-family: Serif;, color: #141A46;'>FloWell</h1>", unsafe_allow_html=True)
-    # st.sidebar.title(":blue[FloWell]")
     st.sidebar.image(logo_url, use_column_width=True)
     selected = option_menu("Main Menu", ["Home", 'Admissions', "Clinical Notes"], 
         icons=['house', 'hospital', "clipboard"], menu_icon="cast", default_index=2)
@@ -199,11 +180,11 @@ else:
     edited_df = st.data_editor(df_problems, use_container_width=True)
     
     st.header("Vertex AI Gemini API", divider="rainbow")
-    tab1, tab2, tab3 = st.tabs(
-    ["Generate Note Summary", "Patient Timeline", "Discharge"]
-    )
+    tab1, tab2, tab3 = st.tabs(["📑 Notes Summary", "⌛ Patient Timeline", "📩 Discharge Section"])
     
-    #*************** Summarize LLM, put the firts prompt here*********************    
+    #####################################################################################################################################
+    #*********************************** Summarize LLM, put the firts prompt here *******************************************************
+    #####################################################################################################################################
     with tab1:
         st.subheader("LMM Summary:")
         
@@ -258,21 +239,20 @@ else:
                 with first_tab2:
                     st.text(prompt)
 
-    with tab2:
-    #*************** Timeline, put the firts prompt here*********************   
+    #####################################################################################################################################
+    #*********************************** Timeline, put the firts prompt here ************************************************************
+    #####################################################################################################################################
+    with tab2:   
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             start = st.date_input("Select start date", datetime.date(2019, 7, 6))
-            st.write("Start is:", start)
 
         with col2:
             end= st.date_input("Select end date", datetime.date(2019, 7, 6))
-            st.write("End is:", end)
 
         with col3:
-            timeline = st.selectbox("Which stage you want to filter?",
+            filter_timeline = st.selectbox("Which stage you want to filter?",
                                     ("Admission", "Patient Care", "Discharge"))
-            st.write("Selected timeline:", timeline)
 
         with col4:
             options = st.multiselect("Specialist filter",
@@ -313,48 +293,38 @@ else:
                 first_tab1, first_tab2 = st.tabs(["Timeline", "Prompt"])
                 
                 with first_tab1:    
-                    response = [
-                        {"id": 1, "content": "static 1", "start": "2022-10-20"},
-                        {"id": 2, "content": "Editable 1", "start": "2022-10-09", "editable": True},
-                        {"id": 3, "content": "Editable 2", "start": "2022-10-18", "editable": True},
-                        {"id": 4, "content": "static 2", "start": "2022-10-16"},
-                        {"id": 5, "content": "static 3", "start": "2022-10-25"},
-                        {"id": 6, "content": "static 4", "start": "2022-10-27"},
-                    ]
+
+                    #TODO: load data static for now, change whith json when it comes
+                    with open('data/patient_timeline.json', "r") as f:
+                        response = f.read()
+
                     # response = get_gemini_pro_text_response(
                     #     text_model_pro,
                     #     prompt,
                     #     generation_config=config,
                     # )
                     if response:
-                        
-                        st.write("Timeline:")
                         # st.write(response)
                         # import pdb; pdb.set_trace()
                         # temp = ''.join(response).replace('```', '').replace('\n', '').replace(' ', '').replace("'",'"').replace("json","")
                         # items = json.loads(temp)
                         items = response
 
-                        with st.expander("See raw response"):
-                            st.write(items)
+                        # with st.expander("See raw response"):
+                        #     st.write(items)
                         
                         st.subheader("Patient event timeline:")
-                        events = st_timeline(items, groups=[], options={}, height="300px")
-                        
-                        st.subheader("Selected note:")
-                        with st.chat_message("user"):
-                            container = st.container(border=True)
-                            st.write(events)
+
+                        # render timeline
+                        timeline(items, height=500)
 
                 with first_tab2:
                     st.text(prompt)
-
-        # items = [
-        #     {"id": 1, "content": "Admission", "start": "2022-10-09"},
-        # ]
-        
+    
+    #####################################################################################################################################
+    #*************************************************** Discharge **********************************************************************
+    #####################################################################################################################################
     with tab3:
-        #********************Discharge***********************************
         st.subheader("Discharge section:")
         st.write("LLM is generating tasks, be patient...")
 
@@ -396,26 +366,72 @@ else:
 
             if st.button("Discharge", type="primary"):
                 st.success("Patient Discharge!")
-                
-            st.header("Print patient procedure")
-            if st.button("Generate Text"):
-             
-                txt ="""\n
-                    You were admitted to the hospital with severe chest pain radiating to your left arm. This indicated a possible heart attack (myocardial infarction).
-                    Upon arrival, an EKG was performed, which showed signs of a heart attack. Blood tests confirmed this diagnosis. A cardiologist recommended an urgent procedure called a coronary angioplasty with stent placement to open up a blocked artery.
-                    The procedure was successful in opening the blocked artery in your left anterior descending artery (LAD) and placing a stent. You recovered well from the procedure, and your pain was managed with medication.
-                    During your stay, you received physical therapy, occupational therapy, and education from a dietician to help you recover and regain your strength. You also had an echocardiogram, which showed good left ventricular function with minimal wall motion abnormality.
-                    You were discharged home on May 27th with medication and a follow-up appointment scheduled. You were also given instructions for a home exercise program and advice on lifestyle changes to maintain good heart health. Please be sure to contact your doctor if you experience any chest pain, shortness of breath, dizziness, or swelling in your legs.
-                    """
+  
+            tab1, tab2 = st.tabs(["Discharge Summary", "Patient discharge letter"])
 
-                st.write(txt)
-                st.button("Download Text", on_click=lambda: download_text(txt, filename="patient_1.txt"))
-                st.success("The text file has been created successfully!")
-            
+            with tab1:
+                with st.container(border=True):
+                    st.header("Discharge Summary")
+                    if st.button("Generate summary"):
+                        txt ="""\n
+                            You were admitted to the hospital with severe chest pain radiating to your left arm. This indicated a possible heart attack (myocardial infarction).
+                            Upon arrival, an EKG was performed, which showed signs of a heart attack. Blood tests confirmed this diagnosis. A cardiologist recommended an urgent procedure called a coronary angioplasty with stent placement to open up a blocked artery.
+                            The procedure was successful in opening the blocked artery in your left anterior descending artery (LAD) and placing a stent. You recovered well from the procedure, and your pain was managed with medication.
+                            During your stay, you received physical therapy, occupational therapy, and education from a dietician to help you recover and regain your strength. You also had an echocardiogram, which showed good left ventricular function with minimal wall motion abnormality.
+                            You were discharged home on May 27th with medication and a follow-up appointment scheduled. You were also given instructions for a home exercise program and advice on lifestyle changes to maintain good heart health. Please be sure to contact your doctor if you experience any chest pain, shortness of breath, dizziness, or swelling in your legs.
+                            """
+
+                        st.write(txt)
+                        st.success("Discharge summary created successfully!")
+            with tab2:
+                with st.container(border=True):
+                    st.header("Patient letter")
+                    if st.button("Generate letter"):
+                        st.success("Patient letter created successfully!")
+                        text_contents ='''\n
+                        Patient Discharge Letter
+
+                        Dear [Patient Name],
+
+                        We are pleased to inform you that you have been discharged from the hospital following your recent admission for severe chest pain.
+
+                        Hospital Stay Summary:
+                        You were admitted with chest pain radiating to your left arm, indicating a possible heart attack (myocardial infarction). An EKG and blood tests confirmed this. A coronary angioplasty with stent placement was successfully performed on your left anterior descending artery (LAD).
+
+                        Recovery and Care:
+                        You recovered well from the procedure, and your pain was managed with medication. You received physical and occupational therapy, and dietary education. An echocardiogram showed good heart function with minimal abnormalities.
+
+                        Discharge Information:
+
+                        Discharge Date: May 27, 2024
+                        Medications: Take all prescribed medications as directed.
+                        Follow-Up: Attend your scheduled follow-up appointment.
+                        Exercise and Lifestyle: Follow the home exercise program and lifestyle changes advised to maintain good heart health.
+                        Emergency Instructions:
+                        Contact your doctor or seek immediate medical attention if you experience chest pain, shortness of breath, dizziness, or leg swelling.
+
+                        Your health and recovery are our top priorities. Please reach out if you have any questions or concerns.
+
+                        Wishing you a swift recovery,
+
+                        Dr. [Doctor’s Name]
+                        [Title]
+                        [Hospital Name]
+
+                        Contact Information:
+                        [Hospital Contact Information]   
+                        '''
+                        today = str(datetime.date.today())
+                        st.write(text_contents)
+                        st.download_button("Download letter", text_contents,   file_name=f"{id_option}-{today}-letter.txt", type="primary", use_container_width=True)
+                        
         else:
             st.warning('Complete the remaining task to proceed discharge!', icon="⚠️")
 
-#********************************** Chatbot section in sidebar****************************************************
+#####################################################################################################################################
+#****************************************** Chatbot section in sidebar **************************************************************
+#####################################################################################################################################
+
 # Streamed response emulator
 def response_generator():
     response = random.choice(

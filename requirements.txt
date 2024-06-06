@@ -2,7 +2,8 @@ altair
 pandas
 streamlit
 streamlit-option-menu
-streamlit-vis-timeline # streamlit_timeline
+streamlit_timeline
+# streamlit-vis-timeline # old version timeline
 setuptools
 python-dotenv
 google-generativeai

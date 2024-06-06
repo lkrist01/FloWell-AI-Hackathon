@@ -1,0 +1,79 @@
+{
+  "events": [
+    {
+      "start_date": {
+        "year": "2023",
+        "month": "5",
+        "day": "1"
+      },
+      "media": {
+        "url": "https://example.com/patient_admission.png",
+        "credit": "Hospital X"
+      },
+      "text": {
+        "headline": "Patient Admission",
+        "text": "Patient was admitted to Hospital X on May 1, 2023 at 10:00 AM with complaints of chest pain and shortness of breath. Vital signs were stable and EKG showed signs of ischemia. Patient was immediately taken to the cardiac care unit for further monitoring."
+      }
+    },
+    {
+      "start_date": {
+        "year": "2023",
+        "month": "5",
+        "day": "2"
+      },
+      "media": {
+        "url": "https://example.com/patient_diagnostics.png",
+        "credit": "Hospital X"
+      },
+      "text": {
+        "headline": "Diagnostic Tests",
+        "text": "The patient underwent several diagnostic tests, including a cardiac catheterization, which revealed a 90% blockage in the left anterior descending artery. The patient was diagnosed with acute coronary syndrome and started on medication."
+      }
+    },
+    {
+      "start_date": {
+        "year": "2023",
+        "month": "5",
+        "day": "3"
+      },
+      "media": {
+        "url": "https://example.com/patient_surgery.png",
+        "credit": "Hospital X"
+      },
+      "text": {
+        "headline": "Coronary Artery Bypass Surgery",
+        "text": "The patient underwent successful coronary artery bypass surgery on May 3, 2023. The surgery was performed by Dr. Smith, a renowned cardiac surgeon at Hospital X. The patient's heart function improved significantly after the surgery."
+      }
+    },
+    {
+      "start_date": {
+        "year": "2023",
+        "month": "5",
+        "day": "5"
+      },
+      "media": {
+        "url": "https://example.com/patient_rehabilitation.png",
+        "credit": "Hospital X"
+      },
+      "text": {
+        "headline": "Cardiac Rehabilitation",
+        "text": "The patient began cardiac rehabilitation on May 5, 2023. The rehabilitation program included exercise, education, and counseling to help the patient recover from the surgery and reduce the risk of future heart problems. The patient was discharged from the hospital on May 7, 2023 with instructions for follow-up care."
+      }
+    },
+    {
+      "start_date": {
+        "year": "2023",
+        "month": "6",
+        "day": "1"
+      },
+      "media": {
+        "url": "https://example.com/patient_followup.png",
+        "credit": "Hospital X"
+      },
+      "text": {
+        "headline": "Follow-Up Appointment",
+        "text": "The patient had a follow-up appointment with Dr. Smith on June 1, 2023. The doctor reported that the patient's heart function had improved significantly since the surgery and that the patient was making good progress with the rehabilitation program. The patient was advised to continue with the rehabilitation program and to schedule regular follow-up appointments with the doctor."
+      }
+    }
+  ]
+}
