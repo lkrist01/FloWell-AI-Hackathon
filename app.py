@@ -40,16 +40,6 @@ def get_all_notes_text(df, nhs_id):
     r1 = ", ".join(r["Notes Entry"].astype(str))
     return r1
 
-def create_word_doc(text):
-    doc = Document()
-    doc.add_heading('Document Title', 0)
-    doc.add_paragraph(text)
-    
-    byte_io = BytesIO()
-    doc.save(byte_io)
-    byte_io.seek(0)
-    return byte_io
-
 # Function to update the value in session state
 def clicked(button):
     st.session_state.clicked[button] = True
@@ -114,13 +104,13 @@ with st.sidebar:
   
 
 if selected == "Home":
-    """
-    # Flowell
-
-    Welcome to Flowell! An application designed to enhance integrated care and discharge processes by summarising information from patient electronic health records into an accurate timeline of events, creating a more productive pipeline that flows well!
-    
-    FloWell provides exactly that. Using StreamLit, Vertex AI and Gemini API, we created a dynamic navigator of the patient’s journey, turning complex notes into a clear, concise timeline, so you can understand their journey in seconds.
-    """
+    st.title(':blue[_Flowell_]')
+    desc ="""
+        Welcome to Flowell! An application designed to enhance integrated care and discharge processes by summarising information from patient electronic health records into an accurate timeline of events, creating a more productive pipeline that flows well!
+        
+        FloWell provides exactly that. Using StreamLit, Vertex AI and Gemini API, we created a dynamic navigator of the patient’s journey, turning complex notes into a clear, concise timeline, so you can understand their journey in seconds.
+        """
+    st.write(desc)
 
 elif selected == "Admissions": 
 
@@ -133,10 +123,16 @@ elif selected == "Admissions":
         longitude='Longitude',
     )
 
-    df_admissions = pd.read_csv("data/admissions.csv")
-    st.dataframe(df_admissions) 
+    df_admissions = pd.read_csv("data/admissions.csv")[:100]
+
+    tab1, tab2 = st.tabs(["📈 Chart", "🗃 Data"])
+    tab1.subheader("A tab with a chart")
+    tab1.line_chart(df_admissions["Ip Elect Total"])
+
+    tab2.subheader("A tab with the data")
+    tab2.dataframe(df_admissions)
+
 else:
-    
     df_patients = pd.read_csv("data/patients.csv")
     ids = df_patients["NHS Number"].unique()
     # text_model_pro = load_model()
@@ -252,7 +248,7 @@ else:
 
         with col3:
             filter_timeline = st.selectbox("Which stage you want to filter?",
-                                    ("Admission", "Patient Care", "Discharge"))
+                                    (None,"Admission", "Patient Care", "Discharge"))
 
         with col4:
             options = st.multiselect("Specialist filter",
