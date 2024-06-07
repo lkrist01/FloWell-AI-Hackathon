@@ -357,7 +357,7 @@ else:
     #####################################################################################################################################
     with tab3:
         st.subheader("Discharge section:")
-        st.write("LLM is generating tasks, be patient...")
+        st.spinner('LLM is generating tasks, be patient...')
 
         discharge_tasks = {
             'Task':
@@ -397,7 +397,8 @@ else:
         if discharge_edited['Completed'].all() == True:
 
             if st.button("Discharge", type="primary"):
-                st.success("Patient Discharge!")
+                # st.success("Patient Discharge!")
+                st.toast('Patient Discharged!', icon='📤')
 
             tab1, tab2 = st.tabs(
                 ["Discharge Summary", "Patient discharge letter"])
