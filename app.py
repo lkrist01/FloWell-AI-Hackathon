@@ -115,10 +115,12 @@ with st.sidebar:
 if selected == "Home":
     st.title(':blue[_Flowell_]')
     desc = """
-        Welcome to Flowell! An application designed to enhance integrated care and discharge processes by summarising information from patient electronic health records into an accurate timeline of events, creating a more productive pipeline that flows well!
-        
-        FloWell provides exactly that. Using StreamLit, Vertex AI and Gemini API, we created a dynamic navigator of the patient’s journey, turning complex notes into a clear, concise timeline, so you can understand their journey in seconds.
-        """
+        Welcome to FloWell!
+
+        FloWell is an advanced discharge navigation tool designed to enhance integrated care and discharge processes by summarizing patient information from electronic health records (EHR) into a clear, concise timeline. Using **Streamlit**, **Vertex AI**, and **Gemini API**, FloWell turns complex patient notes into an accurate timeline of events, allowing you to understand a patient's journey in seconds.
+
+        By aggregating all patient notes, FloWell generates key summaries and constructs a comprehensive timeline from admission to discharge. This innovative tool identifies the necessary steps required for a patient’s discharge, addressing challenges related to synthesizing large volumes of data entries from various healthcare professionals. FloWell enhances resource allocation, improves communication among healthcare staff, reduces clinical errors, and ultimately optimizes patient outcomes and hospital efficiency.
+    """
     st.write(desc)
 
 elif selected == "Admissions":
@@ -141,6 +143,7 @@ elif selected == "Admissions":
     tab2.subheader("A tab with the data")
     tab2.dataframe(df_admissions)
 
+# Clinical notes section
 else:
     df_patients = pd.read_csv("data/patients.csv")
     ids = df_patients["NHS Number"].unique()
@@ -162,7 +165,7 @@ else:
     specialities = df_notes["Clinician Type"].unique()
 
     # *************** Checklist for problems, put the firts prompt here*********************
-    st.subheader("Patient problem list:")
+    st.header("Patient problem list:", divider="rainbow")
 
     problems = {
         'Problem': [
@@ -200,7 +203,7 @@ else:
     }
 
     df_problems = pd.DataFrame(problems)
-    edited_df = st.data_editor(df_problems.style.applymap(color_severity, subset=[
+    edited_df = st.data_editor(df_problems.style.map(color_severity, subset=[
                                'Severity']), use_container_width=True, disabled=["Severity"])
 
     st.header("Vertex AI Gemini API", divider="rainbow")
@@ -263,7 +266,7 @@ else:
                             container = st.container(border=True)
                             st.write(response)
                 with first_tab2:
-                    st.text(prompt)
+                    st.code(prompt)
 
     #####################################################################################################################################
     # *********************************** Timeline, put the firts prompt here ************************************************************
@@ -347,7 +350,7 @@ else:
                         timeline(items, height=500)
 
                 with first_tab2:
-                    st.text(prompt)
+                    st.code(prompt)
 
     #####################################################################################################################################
     # *************************************************** Discharge **********************************************************************
