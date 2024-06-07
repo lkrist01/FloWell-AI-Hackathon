@@ -10,3 +10,4 @@ google-generativeai
 google-cloud-aiplatform
 google-cloud-logging
 python-docx
+autopep8 #formater
